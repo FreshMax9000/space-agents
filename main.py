@@ -8,6 +8,7 @@ from pygame.locals import *
 WIDTH = 900
 HEIGHT = 900
 FPS = 30.0
+BORDER_EVASION_BASE = 1.1
 
 
 class Boid(pg.sprite.Sprite):
@@ -16,7 +17,7 @@ class Boid(pg.sprite.Sprite):
     def __init__(self, position: pg.Vector2):
         super().__init__()
         self.position = position
-        self.velocity = 150
+        self.velocity = 50
         self.direction = pg.Vector2(10.0, 10.0)
         self.heading = 0.0
 
@@ -44,7 +45,7 @@ class Boid(pg.sprite.Sprite):
             if not self.position.distance_squared_to(boid.position) == 0.0:
                 swarm_center += boid.position
         swarm_center = swarm_center / len(boids)
-        return (swarm_center - self.position).normalize()
+        return (swarm_center - self.position)
 
 
     def separation(self, boids):
@@ -57,21 +58,19 @@ class Boid(pg.sprite.Sprite):
     def border_aversion(self):
         aversion_vector = pg.Vector2((0, 0))
         if self.position.x < 0:
-            aversion_vector.x = 1
+            aversion_vector.x = BORDER_EVASION_BASE ** -self.position.x
         elif self.position.x > WIDTH:
-            aversion_vector.x = -1
+            aversion_vector.x = -(BORDER_EVASION_BASE ** (self.position.x - WIDTH))
         if self.position.y < 0:
-            aversion_vector.y = 1
+            aversion_vector.y = BORDER_EVASION_BASE ** -self.position.y
         elif self.position.y > HEIGHT:
-            aversion_vector.y = -1
-        if aversion_vector.length() != 0.0:
-            return aversion_vector.normalize()
+            aversion_vector.y = -(BORDER_EVASION_BASE ** (self.position.y - HEIGHT))
         return aversion_vector
 
     def compute(self, boids):
         direction_vector = self.alignment(boids)
-        direction_vector += self.cohesion(boids)
-        direction_vector += self.separation(boids) * 10
+        direction_vector += self.cohesion(boids) * 0.01
+        direction_vector += self.separation(boids)
         direction_vector += self.border_aversion()
         direction_vector = direction_vector.normalize()
         return direction_vector
@@ -96,8 +95,9 @@ def main():
     fps_clock = pg.time.Clock()
 
     boids = pg.sprite.RenderUpdates()
-    for i in range(30):
-        boids.add(Boid(pg.Vector2((100, 10 * i + 200))))
+    for i in range(10):
+        for j in range(20):
+            boids.add(Boid(pg.Vector2((i * 30, j * 30))))
 
     while(True):
         for event in pg.event.get():
