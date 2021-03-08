@@ -11,14 +11,12 @@ FPS = 30.0
 
 
 class Boid(pg.sprite.Sprite):
-    image = pg.Surface((10, 10), pg.SRCALPHA)
-    pg.draw.polygon(image, pg.Color('white'),
-        [(15, 5), (0, 2), (0, 8)])
+    image = pg.image.load("images/x_wing_test.png")
     
     def __init__(self, position: pg.Vector2):
         super().__init__()
         self.position = position
-        self.velocity = 400
+        self.velocity = 150
         self.direction = pg.Vector2(10.0, 10.0)
         self.heading = 0.0
 
@@ -54,7 +52,7 @@ class Boid(pg.sprite.Sprite):
         for boid in boids:
             if not self.position.distance_squared_to(boid.position) == 0.0:
                 aversion_vector += -1 / self.position.distance_squared_to(boid.position) * (boid.position - self.position)
-        return aversion_vector.normalize()
+        return aversion_vector
 
     def border_aversion(self):
         aversion_vector = pg.Vector2((0, 0))
@@ -73,7 +71,7 @@ class Boid(pg.sprite.Sprite):
     def compute(self, boids):
         direction_vector = self.alignment(boids)
         direction_vector += self.cohesion(boids)
-        direction_vector += self.separation(boids)
+        direction_vector += self.separation(boids) * 10
         direction_vector += self.border_aversion()
         direction_vector = direction_vector.normalize()
         return direction_vector
@@ -98,8 +96,8 @@ def main():
     fps_clock = pg.time.Clock()
 
     boids = pg.sprite.RenderUpdates()
-    for i in range(10):
-        boids.add(Boid(pg.Vector2((100, 100 * i))))
+    for i in range(30):
+        boids.add(Boid(pg.Vector2((100, 10 * i + 200))))
 
     while(True):
         for event in pg.event.get():
