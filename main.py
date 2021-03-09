@@ -5,14 +5,17 @@ import time
 #third party imports
 import pygame as pg
 from pygame.locals import *
+import tkinter
+from tkinter import messagebox
 
 
 WIDTH = 1200
 HEIGHT = 900
 FPS = 30
 BORDER_EVASION_BASE = 1.1
-BOID_SPEED = 150
-BOIDS_COUNT = 100
+BOID_SPEED = 300
+REBEL_COUNT = 30
+IMPERIAL_COUNT = 30
 VISION = 50
 
 ALIGNMENT = 5
@@ -21,7 +24,7 @@ SEPERATION = 300
 
 fireSprites = pg.sprite.RenderUpdates()
 
-class DeadlyLaser(pg.sprite.Sprite):
+class DeadlyLaserRed(pg.sprite.Sprite):
     image = pg.Surface((300, 5), pg.SRCALPHA)
     pg.draw.rect(image, pg.Color('red'),
         pg.rect.Rect(0, 0, 300, 300), width = 3)  
@@ -38,6 +41,16 @@ class DeadlyLaser(pg.sprite.Sprite):
         pg.sprite.spritecollide(self, boids, dokill=True)
         self.kill()
 
+class DeadlyLaserGreen(DeadlyLaserRed):
+    image = pg.Surface((300, 5), pg.SRCALPHA)
+    pg.draw.rect(image, pg.Color('green'),
+        pg.rect.Rect(0, 0, 300, 300), width = 3)  
+
+class ProbeDummy(pg.sprite.Sprite):
+
+    def __init__(self, rect):
+        super().__init__()
+        self.rect = rect
 
 class Boid(pg.sprite.Sprite):
     image = pg.Surface((10, 10), pg.SRCALPHA)
@@ -48,13 +61,19 @@ class Boid(pg.sprite.Sprite):
         super().__init__()
         self.position = position
         self.velocity = BOID_SPEED
-        self.direction = pg.Vector2(10.0, 10.0).normalize()
+        self.direction = pg.Vector2(random.randint(0, 10) - 5, random.randint(0, 10) - 5).normalize()
         self.heading = 0.0
         self.image = pg.transform.rotate(self.__class__.image, -self.heading)
         self.rect = self.image.get_rect(center=self.position)
+        self.aim_rect = pg.transform.rotate(DeadlyLaserRed.image, -self.direction.as_polar()[1]).get_rect(center=self.position + self.direction * 170)
 
-    def fire(self, boids):
-        DeadlyLaser(self.position, self.direction)
+    def fire(self):
+        DeadlyLaserRed(self.position, self.direction)
+
+    def probe_fire(self, enemy_boids):
+        if pg.sprite.spritecollide(ProbeDummy(self.aim_rect), enemy_boids, dokill=False) != []:
+            return True
+        return False
 
     def filter_boids(self, boids, radius):
         boids2 = boids
@@ -62,13 +81,12 @@ class Boid(pg.sprite.Sprite):
             distance = self.position.distance_to(boid.position)
             if distance > radius or distance == 0.0:
                 boids2.remove(boid)
-        if len(boids) == 0:
-            print(len(boids2))
         return boids2
 
-    def update(self, boids, dt: float):
-        if random.randrange(100) == 99:
-            self.fire(boids)
+    def update(self, boids, enemy_boids, dt: float):
+        self.aim_rect = pg.transform.rotate(DeadlyLaserRed.image, -self.direction.as_polar()[1]).get_rect(center=self.position + self.direction * 170)
+        if self.probe_fire(enemy_boids):
+            self.fire()
         boids = self.filter_boids(boids, VISION)
         self.direction = self.compute(boids)
         self.position += self.direction * self.velocity * dt 
@@ -138,8 +156,14 @@ class Boid(pg.sprite.Sprite):
 class XWing(Boid):
     image = pg.image.load("images/x_wing_test.png")
 
+    def fire(self):
+        DeadlyLaserRed(self.position, self.direction)
+
 class TieFighter(Boid):
-    pass
+    image = pg.image.load("images/tie_fighter_test.png")
+
+    def fire(self):
+        DeadlyLaserGreen(self.position, self.direction)
 
 def draw(screen, background, boids):
     boids.clear(screen, background)
@@ -150,12 +174,24 @@ def draw(screen, background, boids):
     pg.display.update(lasers)
     #pg.display.flip()
 
-def update(boids, dt):
-    old_boids = boids.copy()
+def update(boids, x_wings, tie_fighters, dt):
+    old_wings = x_wings.copy()
+    old_ties = tie_fighters.copy()
     for laser in fireSprites:
         laser.update(boids)
-    for b in boids:
-        b.update(old_boids.copy(), dt)
+    for xwing in x_wings:
+        xwing.update(old_wings.copy(), tie_fighters.copy(), dt)
+    for tie in tie_fighters:
+        tie.update(old_ties.copy(), x_wings.copy(), dt)
+
+def show_info(info: str):
+    root = tkinter.Tk()
+    root.withdraw()
+    messagebox.showinfo("Info!", info)
+
+def exit():
+    pg.quit()
+    sys.exit(0)
 
 def main():
     pg.init()
@@ -168,18 +204,31 @@ def main():
     fps_clock = pg.time.Clock()
 
     boids = pg.sprite.RenderUpdates()
-    for i in range(int(math.sqrt(BOIDS_COUNT))):
-        for j in range(int(math.sqrt(BOIDS_COUNT))):
-            boids.add(XWing(pg.Vector2((i * 30 + 200, j * 30 + 200))))
+    x_wings = pg.sprite.RenderUpdates()
+    tie_fighters = pg.sprite.RenderUpdates()
+    for i in range(int(math.sqrt(REBEL_COUNT))):
+        for j in range(int(math.sqrt(REBEL_COUNT))):
+            xwing = XWing(pg.Vector2((i * 30, j * 30)))
+            boids.add(xwing)
+            x_wings.add(xwing)
+    for i in range(int(math.sqrt(IMPERIAL_COUNT))):
+        for j in range(int(math.sqrt(IMPERIAL_COUNT))):
+            tie = TieFighter(pg.Vector2((i * 30 + 400, j * 30 + 400)))
+            boids.add(tie)
+            tie_fighters.add(tie)
 
     while(True):
         for event in pg.event.get():
             if event.type == QUIT:
-                pg.quit()
-                sys.exit(0)
+                exit()
         dt = fps_clock.tick(FPS) * 1e-3
-        print(float(dt))
-        update(boids, dt)
+        if len(x_wings) == 0:
+            show_info("The empire has won!")
+            exit()
+        if len(tie_fighters) == 0:
+            show_info("The rebel alliance has won!")
+            exit()
+        update(boids, x_wings, tie_fighters, dt)
         draw(screen, background, boids)
 
 if __name__ == "__main__":
