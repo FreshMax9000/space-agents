@@ -61,7 +61,6 @@ class Boid(pg.sprite.Sprite):
             return average_heading_vector
         return average_heading_vector.normalize()
 
-
     def cohesion(self, boids):
         swarm_center = pg.Vector2((0, 0))
         counted = 0
@@ -70,23 +69,17 @@ class Boid(pg.sprite.Sprite):
                 if self.position.distance_to(boid.position) < 150:
                     swarm_center += boid.position
                     counted += 1
-        #swarm_center = swarm_center / len(boids)
         if counted == 0:
             return swarm_center
         swarm_center = swarm_center / counted
-        if (swarm_center - self.position).length() == 0.0 or True:
-            return swarm_center - self.position
-        return (swarm_center - self.position).normalize()
-
+        return swarm_center - self.position
 
     def separation(self, boids):
         aversion_vector = pg.Vector2((0, 0))
         for boid in boids:
             if not self.position.distance_squared_to(boid.position) == 0.0:
                 aversion_vector += -1 / self.position.distance_squared_to(boid.position) * (boid.position - self.position)
-        if aversion_vector.length() == 0.0 or True:
-            return aversion_vector
-        return aversion_vector.normalize()
+        return aversion_vector
 
     def border_aversion(self):
         aversion_vector = pg.Vector2((0, 0))
@@ -108,22 +101,15 @@ class Boid(pg.sprite.Sprite):
         direction_vector += self.cohesion(boids) * COHESION
         direction_vector += self.separation(boids) * SEPERATION
         direction_vector += self.border_aversion()
-        #direction_vector = direction_vector.normalize()
         return self.limit_turn(direction_vector)
 
 class XWing(Boid):
     image = pg.image.load("images/x_wing_test.png")
 
-class TieFighter(Boid):
-    pass
-
 def draw(screen, background, boids):
     boids.clear(screen, background)
-    fireSprites.clear(screen, background)
-    lasers = fireSprites.draw(screen)
     dirty = boids.draw(screen)
     pg.display.update(dirty)
-    pg.display.update(lasers)
 
 def update(boids, dt):
     old_boids = boids.copy()
