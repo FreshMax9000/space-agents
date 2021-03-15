@@ -15,6 +15,7 @@ from lasers import DeadlyLaserGreen
 from boids import XWing
 from boids import TieFighter
 from behaviours import StandardBehaviour
+from faction import Faction
 
 
 logging.basicConfig(
@@ -26,36 +27,40 @@ logging.basicConfig(
 laserSprites = pg.sprite.RenderUpdates()
 
 
-def draw(screen, background, boids):
-    boids.clear(screen, background)
+def draw(screen, background, factions):
     laserSprites.clear(screen, background)
+    for faction in factions:
+        faction.boids.clear(screen, background)
+        pg.display.update(faction.boids.draw(screen))
     lasers = laserSprites.draw(screen)
-    dirty = boids.draw(screen)
-    pg.display.update(dirty)
     pg.display.update(lasers)
 
-def update(boids, x_wings, tie_fighters, dt):
-    old_wings = x_wings.copy()
-    old_ties = tie_fighters.copy()
+def update(factions, dt):
+    
     for laser in laserSprites:
-        laser.update(boids)
-    for xwing in x_wings:
-        xwing.update(old_wings.copy(), tie_fighters.copy(), laserSprites, dt)
-    for tie in tie_fighters:
-        tie.update(old_ties.copy(), x_wings.copy(), laserSprites, dt)
+        for faction in factions:
+            laser.update(faction.boids)
+    old_factions = [faction.copy() for faction in factions]
+    for faction in factions:
+        enemies = pg.sprite.RenderUpdates()
+        friends = pg.sprite.RenderUpdates()
+        for old_faction in old_factions:
+            if not old_faction.has(faction.boids.sprites()[0]):
+                enemies.add(old_faction.boids.sprites())
+            else:
+                friends.add(old_faction.boids.sprites())
+        faction.update(friends, enemies, laserSprites, dt)
 
-def fill_rebels(boids, x_wings, count):
+def fill_rebels(x_wings, count):
     for i in range(int(math.sqrt(const.REBEL_COUNT))):
         for j in range(int(math.sqrt(const.REBEL_COUNT))):
             xwing = XWing(pg.Vector2((i * 30, j * 30)), StandardBehaviour)
-            boids.add(xwing)
             x_wings.add(xwing)
 
-def fill_imperial(boids, tie_fighters, count):
+def fill_imperial(tie_fighters, count):
     for i in range(int(math.sqrt(count))):
         for j in range(int(math.sqrt(count))):
             tie = TieFighter(pg.Vector2((i * 30 + 750, j * 30 + 750)), StandardBehaviour)
-            boids.add(tie)
             tie_fighters.add(tie)
 
 def show_info(info: str):
@@ -77,12 +82,16 @@ def main():
 
     fps_clock = pg.time.Clock()
 
-    boids = pg.sprite.RenderUpdates()
     x_wings = pg.sprite.RenderUpdates()
     tie_fighters = pg.sprite.RenderUpdates()
-    fill_rebels(boids, x_wings, const.REBEL_COUNT)
-    fill_imperial(boids, tie_fighters, const.IMPERIAL_COUNT)
+    fill_rebels(x_wings, const.REBEL_COUNT)
+    fill_imperial(tie_fighters, const.IMPERIAL_COUNT)
+    imperial_faction = Faction(tie_fighters)
+    rebel_faction = Faction(x_wings)
+    factions = [imperial_faction, rebel_faction]
+    #factions = [imperial_faction]
 
+    """
     while(True):
         try:
             event = pg.event.get()[0]
@@ -92,6 +101,7 @@ def main():
             exit()
         elif event.type == KEYDOWN:
             break
+    """
 
     while(True):
         for event in pg.event.get():
@@ -106,8 +116,9 @@ def main():
         if len(tie_fighters) == 0:
             show_info("The rebel alliance has won!")
             exit()
-        update(boids, x_wings, tie_fighters, dt)
-        draw(screen, background, boids)
+        #update(boids, factions, dt)
+        update(factions, 0.0333)
+        draw(screen, background, factions)
 
 if __name__ == "__main__":
     main()

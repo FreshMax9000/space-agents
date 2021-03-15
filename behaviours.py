@@ -10,7 +10,7 @@ class BaseBehaviour:
         self.boid = boid
 
     def get_moves(self, friends, enemies, laser_hit_enemy, distress_calls):
-        # return (direction: pg.Vector2, fire: bool)
+        # return (direction: pg.Vector2, fire: bool, distress_call: pg.Vector2)
         pass
 
 
@@ -24,7 +24,7 @@ class StandardBehaviour(BaseBehaviour):
             print("err")
         direction = self.compute(friends, enemies)
         fire = laser_hit_enemy
-        return (direction, fire)
+        return (direction, fire, None)
 
     def alignment(self, boids):
         average_heading_vector = pg.Vector2((0, 0))
@@ -40,17 +40,16 @@ class StandardBehaviour(BaseBehaviour):
         counted = 0
         for boid in boids:
             if not self.boid.position.distance_squared_to(boid.position) == 0.0:
-                if self.boid.position.distance_to(boid.position) < 150:
-                    swarm_center += boid.position
-                    counted += 1
+                swarm_center += boid.position
+                counted += 1
         if counted == 0:
             return swarm_center
         swarm_center = swarm_center / counted
         return swarm_center - self.boid.position
 
-    def separation(self, boids):
+    def separation(self, friends):
         aversion_vector = pg.Vector2((0, 0))
-        for boid in boids:
+        for boid in friends:
             if not self.boid.position.distance_squared_to(boid.position) == 0.0:
                 aversion_vector += -1 / self.boid.position.distance_squared_to(boid.position) * (boid.position - self.boid.position)
         return aversion_vector

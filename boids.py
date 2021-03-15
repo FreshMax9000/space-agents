@@ -44,21 +44,21 @@ class Boid(pg.sprite.Sprite):
         return False
 
     def filter_boids(self, boids, radius):
-        boids2 = boids
+        boids2 = boids.copy()
         for boid in boids:
             distance = self.position.distance_to(boid.position)
             if distance > radius or distance == 0.0:
                 boids2.remove(boid)
         return boids2
 
-    def update(self, boids, enemy_boids, laser_sprites, dt: float):
+    def update(self, boids, enemy_boids, laser_sprites, dt: float, distress_calls: list):
         boids = self.filter_boids(boids, const.VISION)
         enemy_boids = self.filter_boids(enemy_boids, const.VISION)
         # Check if laser would hit enemy
         self.aim_rect = pg.transform.rotate(DeadlyLaserRed.image, -self.direction.as_polar()[1]).get_rect(center=self.position + self.direction * 170)
         laser_hit_enemy = self.probe_fire(enemy_boids)
         # compute Behaviour based on specific behaviour class
-        direction, fire = self.behaviour.get_moves(boids, enemy_boids, laser_hit_enemy)
+        direction, fire, distress_call = self.behaviour.get_moves(boids, enemy_boids, laser_hit_enemy, distress_calls)
 
         self.direction = self.limit_turn(direction) #limit direction change
         # Fire if requested
@@ -68,7 +68,8 @@ class Boid(pg.sprite.Sprite):
         self.position += self.direction * self.velocity * dt 
         speed, self.heading = self.direction.as_polar()
         self.image = pg.transform.rotate(self.__class__.image, -self.heading)
-        self.rect = self.image.get_rect(center=self.position)    
+        self.rect = self.image.get_rect(center=self.position)  
+        return distress_call  
 
     def limit_turn(self, desired_turn: pg.Vector2):
         try:
