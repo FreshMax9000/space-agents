@@ -22,6 +22,7 @@ SEPERATION = 300
 
 
 class Boid(pg.sprite.Sprite):
+    # Set visual representation of Boid
     image = pg.Surface((10, 10), pg.SRCALPHA)
     pg.draw.polygon(image, pg.Color('white'),
         [(15, 5), (0, 2), (0, 8)])
@@ -29,34 +30,27 @@ class Boid(pg.sprite.Sprite):
     def __init__(self, position: pg.Vector2):
         super().__init__()
         self.position = position
-        self.velocity = BOID_SPEED
-        self.direction = pg.Vector2(10.0, 10.0).normalize()
-        self.heading = 0.0
-        self.image = pg.transform.rotate(self.__class__.image, -self.heading)
-        self.rect = self.image.get_rect(center=self.position)
+        self.direction = pg.Vector2(10.0, 10.0).normalize() # Set initial moving direction
 
     def filter_boids(self, boids, radius):
-        boids2 = boids
         for boid in boids:
             distance = self.position.distance_to(boid.position)
             if distance > radius or distance == 0.0:
-                boids2.remove(boid)
-        if len(boids) == 0:
-            print(len(boids2))
-        return boids2
+                boids.remove(boid)
+        return boids
 
     def update(self, boids, dt: float):
         boids = self.filter_boids(boids, VISION)
         self.direction = self.compute(boids)
-        self.position += self.direction * self.velocity * dt 
-        speed, self.heading = self.direction.as_polar()
-        self.image = pg.transform.rotate(self.__class__.image, -self.heading)
+        self.position += self.direction * BOID_SPEED * dt 
+        _, heading = self.direction.as_polar()
+        self.image = pg.transform.rotate(self.__class__.image, -heading)
         self.rect = self.image.get_rect(center=self.position)
 
     def alignment(self, boids):
         average_heading_vector = pg.Vector2((0, 0))
         for boid in boids:
-            if not self.position.distance_squared_to(boid.position) == 0.0:
+            if not self == boid:
                 average_heading_vector += boid.direction.normalize()
         if average_heading_vector.length() == 0.0:
             return average_heading_vector
@@ -64,21 +58,15 @@ class Boid(pg.sprite.Sprite):
 
     def cohesion(self, boids):
         swarm_center = pg.Vector2((0, 0))
-        counted = 0
         for boid in boids:
-            if not self.position.distance_squared_to(boid.position) == 0.0:
-                if self.position.distance_to(boid.position) < 150:
-                    swarm_center += boid.position
-                    counted += 1
-        if counted == 0:
-            return swarm_center
-        swarm_center = swarm_center / counted
+            swarm_center += boid.position
+        swarm_center = swarm_center / len(boids)
         return swarm_center - self.position
 
     def separation(self, boids):
         aversion_vector = pg.Vector2((0, 0))
         for boid in boids:
-            if not self.position.distance_squared_to(boid.position) == 0.0:
+            if not self == boid:
                 aversion_vector += -1 / self.position.distance_squared_to(boid.position) * (boid.position - self.position)
         return aversion_vector
 
