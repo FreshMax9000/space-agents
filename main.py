@@ -4,6 +4,7 @@ import time
 import logging
 #third party imports
 import pygame as pg
+
 from pygame.locals import QUIT, KEYDOWN
 import tkinter
 from tkinter import messagebox
@@ -22,6 +23,7 @@ logging.basicConfig(
 
 
 laserSprites = pg.sprite.RenderUpdates()
+
 
 
 def draw(screen, background, boids):
