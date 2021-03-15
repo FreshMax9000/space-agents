@@ -7,14 +7,15 @@ import pygame as pg
 from pygame.locals import *
 
 
+# Game Settings
 WIDTH = 1200
 HEIGHT = 900
 FPS = 30
+# Boid Settings
 BORDER_EVASION_BASE = 1.1
 BOID_SPEED = 150
 BOIDS_COUNT = 100
 VISION = 50
-
 ALIGNMENT = 5
 COHESION = 0.5
 SEPERATION = 300
@@ -103,9 +104,6 @@ class Boid(pg.sprite.Sprite):
         direction_vector += self.border_aversion()
         return self.limit_turn(direction_vector)
 
-class XWing(Boid):
-    image = pg.image.load("images/x_wing_test.png")
-
 def draw(screen, background, boids):
     boids.clear(screen, background)
     dirty = boids.draw(screen)
@@ -129,7 +127,7 @@ def main():
     boids = pg.sprite.RenderUpdates()
     for i in range(int(math.sqrt(BOIDS_COUNT))):
         for j in range(int(math.sqrt(BOIDS_COUNT))):
-            boids.add(XWing(pg.Vector2((i * 30 + 200, j * 30 + 200))))
+            boids.add(Boid(pg.Vector2((i * 30 + 200, j * 30 + 200))))
 
     while(True):
         for event in pg.event.get():
