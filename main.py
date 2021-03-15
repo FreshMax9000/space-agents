@@ -67,8 +67,8 @@ class Boid(pg.sprite.Sprite):
         return boids2
 
     def update(self, boids, dt: float):
-        if random.randrange(100) == 99:
-            self.fire(boids)
+        #if random.randrange(100) == 99:
+        #    self.fire(boids)
         boids = self.filter_boids(boids, VISION)
         self.direction = self.compute(boids)
         self.position += self.direction * self.velocity * dt 
