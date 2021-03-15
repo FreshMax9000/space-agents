@@ -4,7 +4,7 @@ import time
 import logging
 #third party imports
 import pygame as pg
-from pygame.locals import QUIT
+from pygame.locals import QUIT, KEYDOWN
 import tkinter
 from tkinter import messagebox
 #project imports
@@ -80,6 +80,16 @@ def main():
     tie_fighters = pg.sprite.RenderUpdates()
     fill_rebels(boids, x_wings, const.REBEL_COUNT)
     fill_imperial(boids, tie_fighters, const.IMPERIAL_COUNT)
+
+    while(True):
+        try:
+            event = pg.event.get()[0]
+        except IndexError:
+            continue
+        if event.type == QUIT:
+            exit()
+        elif event.type == KEYDOWN:
+            break
 
     while(True):
         for event in pg.event.get():
