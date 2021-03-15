@@ -45,10 +45,13 @@ def update(factions, dt):
         enemies = pg.sprite.RenderUpdates()
         friends = pg.sprite.RenderUpdates()
         for old_faction in old_factions:
-            if not old_faction.has(faction.boids.sprites()[0]):
-                enemies.add(old_faction.boids.sprites())
-            else:
-                friends.add(old_faction.boids.sprites())
+            try:
+                if not old_faction.has(faction.boids.sprites()[0]):
+                    enemies.add(old_faction.boids.sprites())
+                else:
+                    friends.add(old_faction.boids.sprites())
+            except IndexError:
+                logging.warning(f"Faction \"{faction}\" is empty!")
         faction.update(friends, enemies, laserSprites, dt)
 
 def fill_rebels(x_wings, count):
@@ -86,8 +89,8 @@ def main():
     tie_fighters = pg.sprite.RenderUpdates()
     fill_rebels(x_wings, const.REBEL_COUNT)
     fill_imperial(tie_fighters, const.IMPERIAL_COUNT)
-    imperial_faction = Faction(tie_fighters)
-    rebel_faction = Faction(x_wings)
+    imperial_faction = Faction("Imperium", tie_fighters)
+    rebel_faction = Faction("Rebellen", x_wings)
     factions = [imperial_faction, rebel_faction]
     #factions = [imperial_faction]
 
@@ -110,14 +113,14 @@ def main():
         dt = fps_clock.tick(const.FPS) * 1e-3
         if fps_clock.get_rawtime() == fps_clock.get_time():
             logging.warning(f"Lagging behind {fps_clock.get_rawtime() - 1.0 / const.FPS}ms!")
-        if len(x_wings) == 0:
+        if len(factions[1]) == 0:
             show_info("The empire has won!")
             exit()
-        if len(tie_fighters) == 0:
+        if len(factions[0]) == 0:
             show_info("The rebel alliance has won!")
             exit()
         #update(boids, factions, dt)
-        update(factions, 0.0333)
+        update(factions, dt)
         draw(screen, background, factions)
 
 if __name__ == "__main__":
