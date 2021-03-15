@@ -14,6 +14,7 @@ from lasers import DeadlyLaserRed
 from lasers import DeadlyLaserGreen
 from boids import XWing
 from boids import TieFighter
+from behaviours import StandardBehaviour
 
 
 logging.basicConfig(
@@ -23,7 +24,6 @@ logging.basicConfig(
 
 
 laserSprites = pg.sprite.RenderUpdates()
-
 
 
 def draw(screen, background, boids):
@@ -47,14 +47,14 @@ def update(boids, x_wings, tie_fighters, dt):
 def fill_rebels(boids, x_wings, count):
     for i in range(int(math.sqrt(const.REBEL_COUNT))):
         for j in range(int(math.sqrt(const.REBEL_COUNT))):
-            xwing = XWing(pg.Vector2((i * 30, j * 30)))
+            xwing = XWing(pg.Vector2((i * 30, j * 30)), StandardBehaviour)
             boids.add(xwing)
             x_wings.add(xwing)
 
 def fill_imperial(boids, tie_fighters, count):
     for i in range(int(math.sqrt(count))):
         for j in range(int(math.sqrt(count))):
-            tie = TieFighter(pg.Vector2((i * 30 + 750, j * 30 + 750)))
+            tie = TieFighter(pg.Vector2((i * 30 + 750, j * 30 + 750)), StandardBehaviour)
             boids.add(tie)
             tie_fighters.add(tie)
 

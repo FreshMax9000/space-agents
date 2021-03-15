@@ -3,7 +3,7 @@ import pygame as pg
 class DeadlyLaserRed(pg.sprite.Sprite):
     image = pg.Surface((300, 5), pg.SRCALPHA)
     pg.draw.rect(image, pg.Color('red'),
-        pg.rect.Rect(0, 0, 300, 300), width = 3)  
+        pg.rect.Rect(0, 0, 300, 5), width = 300)  
 
     def __init__(self, position, rotation, laser_sprites):
         super().__init__()
@@ -20,4 +20,4 @@ class DeadlyLaserRed(pg.sprite.Sprite):
 class DeadlyLaserGreen(DeadlyLaserRed):
     image = pg.Surface((300, 5), pg.SRCALPHA)
     pg.draw.rect(image, pg.Color('green'),
-        pg.rect.Rect(0, 0, 300, 300), width = 3)
+        pg.rect.Rect(0, 0, 300, 5), width = 300)
