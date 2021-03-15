@@ -19,25 +19,6 @@ ALIGNMENT = 5
 COHESION = 0.5
 SEPERATION = 300
 
-fireSprites = pg.sprite.RenderUpdates()
-
-class DeadlyLaser(pg.sprite.Sprite):
-    image = pg.Surface((300, 5), pg.SRCALPHA)
-    pg.draw.rect(image, pg.Color('red'),
-        pg.rect.Rect(0, 0, 300, 300), width = 3)  
-
-    def __init__(self, position, rotation):
-        super().__init__()
-        self.position = position
-        self.rotation = rotation
-        self.image = pg.transform.rotate(self.__class__.image, -self.rotation.as_polar()[1])
-        self.rect = self.image.get_rect(center=self.position + self.rotation * 170)
-        fireSprites.add(self)
-
-    def update(self, boids):
-        pg.sprite.spritecollide(self, boids, dokill=True)
-        self.kill()
-
 
 class Boid(pg.sprite.Sprite):
     image = pg.Surface((10, 10), pg.SRCALPHA)
@@ -53,9 +34,6 @@ class Boid(pg.sprite.Sprite):
         self.image = pg.transform.rotate(self.__class__.image, -self.heading)
         self.rect = self.image.get_rect(center=self.position)
 
-    def fire(self, boids):
-        DeadlyLaser(self.position, self.direction)
-
     def filter_boids(self, boids, radius):
         boids2 = boids
         for boid in boids:
@@ -67,8 +45,6 @@ class Boid(pg.sprite.Sprite):
         return boids2
 
     def update(self, boids, dt: float):
-        #if random.randrange(100) == 99:
-        #    self.fire(boids)
         boids = self.filter_boids(boids, VISION)
         self.direction = self.compute(boids)
         self.position += self.direction * self.velocity * dt 
@@ -148,12 +124,9 @@ def draw(screen, background, boids):
     dirty = boids.draw(screen)
     pg.display.update(dirty)
     pg.display.update(lasers)
-    #pg.display.flip()
 
 def update(boids, dt):
     old_boids = boids.copy()
-    for laser in fireSprites:
-        laser.update(boids)
     for b in boids:
         b.update(old_boids.copy(), dt)
 
