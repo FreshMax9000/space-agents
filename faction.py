@@ -20,7 +20,7 @@ class Faction:
         return Faction(self.name, self.boids.copy(), old_distress=self.old_distress, new_distress=self.new_distress)
 
     def has(self, sprite: pg.sprite.Sprite):
-        return self.boids.has(sprite)
+        return self.boids.has(sprite)      
 
     def __len__(self):
         return len(self.boids)

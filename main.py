@@ -92,19 +92,6 @@ def main():
     imperial_faction = Faction("Imperium", tie_fighters)
     rebel_faction = Faction("Rebellen", x_wings)
     factions = [imperial_faction, rebel_faction]
-    #factions = [imperial_faction]
-
-    """
-    while(True):
-        try:
-            event = pg.event.get()[0]
-        except IndexError:
-            continue
-        if event.type == QUIT:
-            exit()
-        elif event.type == KEYDOWN:
-            break
-    """
 
     while(True):
         for event in pg.event.get():

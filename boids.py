@@ -68,7 +68,10 @@ class Boid(pg.sprite.Sprite):
         self.position += self.direction * self.velocity * dt 
         speed, self.heading = self.direction.as_polar()
         self.image = pg.transform.rotate(self.__class__.image, -self.heading)
-        self.rect = self.image.get_rect(center=self.position)  
+        self.rect = self.image.get_rect(center=self.position)
+        #clear memory
+        boids.empty()
+        enemy_boids.empty()
         return distress_call  
 
     def limit_turn(self, desired_turn: pg.Vector2):
