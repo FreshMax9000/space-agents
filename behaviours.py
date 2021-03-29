@@ -39,9 +39,8 @@ class StandardBehaviour(BaseBehaviour):
         swarm_center = pg.Vector2((0, 0))
         counted = 0
         for boid in boids:
-            if not self.boid.position.distance_squared_to(boid.position) == 0.0:
-                swarm_center += boid.position
-                counted += 1
+            swarm_center += boid.position
+            counted += 1
         if counted == 0:
             return swarm_center
         swarm_center = swarm_center / counted
@@ -50,8 +49,7 @@ class StandardBehaviour(BaseBehaviour):
     def separation(self, friends):
         aversion_vector = pg.Vector2((0, 0))
         for boid in friends:
-            if not self.boid.position.distance_squared_to(boid.position) == 0.0:
-                aversion_vector += -1 / self.boid.position.distance_squared_to(boid.position) * (boid.position - self.boid.position)
+            aversion_vector += -1 / self.boid.position.distance_squared_to(boid.position) * (boid.position - self.boid.position)
         return aversion_vector
 
     def border_aversion(self):
