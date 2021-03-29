@@ -76,16 +76,16 @@ class Boid(pg.sprite.Sprite):
         return distress_call  
 
     def limit_turn(self, desired_turn: pg.Vector2):
-        if desired_turn.angle_to(self.direction) > 30:
-            desired_turn = desired_turn.rotate(30)
-        elif desired_turn.angle_to(self.direction) < -30:
-            desired_turn = desired_turn.rotate(-30)
+        if desired_turn.angle_to(self.direction) > const.MAXIMUM_TURN_ANGLE:
+            desired_turn = desired_turn.rotate(const.MAXIMUM_TURN_ANGLE)
+        elif desired_turn.angle_to(self.direction) < -const.MAXIMUM_TURN_ANGLE:
+            desired_turn = desired_turn.rotate(-const.MAXIMUM_TURN_ANGLE)
         try:
             desired_turn = desired_turn.normalize()
         except ValueError:
             desired_turn = self.direction
         return desired_turn
-        
+
 
 class XWing(Boid):
     image = pg.image.load("images/x_wing_test.png")
