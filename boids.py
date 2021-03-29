@@ -76,12 +76,16 @@ class Boid(pg.sprite.Sprite):
         return distress_call  
 
     def limit_turn(self, desired_turn: pg.Vector2):
+        if desired_turn.angle_to(self.direction) > 30:
+            desired_turn = desired_turn.rotate(30)
+        elif desired_turn.angle_to(self.direction) < -30:
+            desired_turn = desired_turn.rotate(-30)
         try:
-            return (self.direction + desired_turn.normalize() * 0.5).normalize()
+            desired_turn = desired_turn.normalize()
         except ValueError:
-            logging.info("Not enough inputs for boid, staying on course!")
-            return self.direction.normalize()
-
+            desired_turn = self.direction
+        return desired_turn
+        
 
 class XWing(Boid):
     image = pg.image.load("images/x_wing_test.png")
