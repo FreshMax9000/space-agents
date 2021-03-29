@@ -42,7 +42,7 @@ class Boid(pg.sprite.Sprite):
         DeadlyLaserRed(self.position, self.direction, laser_sprites)
 
     def probe_fire(self, enemy_boids):
-        if pg.sprite.spritecollide(ProbeDummy(self.aim_rect), enemy_boids, dokill=False) != []:
+        if pg.sprite.spritecollideany(ProbeDummy(self.aim_rect), enemy_boids) is not None:
             return True
         return False
 
