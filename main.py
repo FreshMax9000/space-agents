@@ -29,12 +29,23 @@ laserSprites = pg.sprite.RenderUpdates()
 
 
 def draw(screen, background, factions):
+    # Draw status
+    font = pg.font.Font(None, 30)
+    text = f"Rebel count: {len(factions[1])}; Imperial count: {len(factions[0])}"
+    status_surface = pg.Surface((800, 200))
+    status_surface.fill((0, 0, 0))
+    status_surface.blit(font.render(text, 1, (255, 255, 255)), (0, 0))
+    screen.blit(status_surface, status_surface.get_rect())
+    pg.display.update(status_surface.get_rect())
+    
     laserSprites.clear(screen, background)
     for faction in factions:
         faction.boids.clear(screen, background)
         pg.display.update(faction.boids.draw(screen))
+    
     lasers = laserSprites.draw(screen)
     pg.display.update(lasers)
+    
 
 def update(factions, dt):
     
