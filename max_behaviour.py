@@ -57,7 +57,7 @@ class MaxBehaviour2(BaseBehaviour):
     def get_scared(self, boid: Boid):
         offset_pos = self.boid.position - boid.position
         angle_dif = abs(abs(offset_pos.as_polar()[1]) - abs(boid.direction.as_polar()[1]))
-        return angle_dif < 90
+        return angle_dif < 16
 
     def border_aversion(self):
         aversion_vector = pg.Vector2((0, 0))
@@ -85,6 +85,6 @@ class MaxBehaviour2(BaseBehaviour):
                 fire = True
                 direction = self.get_closest_enemy(enemies).position - self.boid.position
         else:
-            direction = self.separation(friends) * 50 + self.border_aversion() + self.spinny_spinny() * 0.001 + self.boid.direction
+            direction = self.separation(friends) + self.border_aversion() + self.spinny_spinny() * 0.01 + self.boid.direction
             fire = False
         return (direction, fire, None)

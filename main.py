@@ -17,6 +17,7 @@ from boids import TieFighter
 from behaviours import StandardBehaviour
 from faction import Faction
 from max_behaviour import MaxBehaviour, MaxBehaviour2
+from benny_behaviour import BennyBehaviour
 
 
 logging.basicConfig(
@@ -69,13 +70,13 @@ def update(factions, dt):
 def fill_rebels(x_wings, count):
     for i in range(int(math.sqrt(const.REBEL_COUNT))):
         for j in range(int(math.sqrt(const.REBEL_COUNT))):
-            xwing = XWing(pg.Vector2((i * 30, j * 30)), StandardBehaviour)
+            xwing = XWing(pg.Vector2((i * 30, j * 30 + 300)), BennyBehaviour)
             x_wings.add(xwing)
 
 def fill_imperial(tie_fighters, count):
     for i in range(int(math.sqrt(count))):
         for j in range(int(math.sqrt(count))):
-            tie = TieFighter(pg.Vector2((i * 30 + 750, j * 30 + 750)), MaxBehaviour2)
+            tie = TieFighter(pg.Vector2((i * 30 + 1500, j * 30 + 300)), MaxBehaviour2)
             tie_fighters.add(tie)
 
 def show_info(info: str):
@@ -95,7 +96,7 @@ def main():
     background = pg.Surface(screen.get_size())
     background.fill(pg.Color("black"))
 
-    fps_clock = pg.time.Clock()
+    
 
     x_wings = pg.sprite.RenderUpdates()
     tie_fighters = pg.sprite.RenderUpdates()
@@ -104,6 +105,10 @@ def main():
     imperial_faction = Faction("Imperium", tie_fighters)
     rebel_faction = Faction("Rebellen", x_wings)
     factions = [imperial_faction, rebel_faction]
+
+    time.sleep(3)
+
+    fps_clock = pg.time.Clock()
 
     while(True):
         for event in pg.event.get():
