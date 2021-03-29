@@ -15,6 +15,7 @@ class MaxBehaviour(BaseBehaviour):
             direction = self.border_aversion()
         else:
             direction = enemies.sprites()[0].position - self.boid.position
+        direction = self.border_aversion()   
         fire = not self.boid.probe_fire(friends) and len(enemies) != 0
 
         return (direction, fire, None)
@@ -23,10 +24,14 @@ class MaxBehaviour(BaseBehaviour):
         aversion_vector = pg.Vector2((0, 0))
         if self.boid.position.x < const.WIDTH_INNER:
             aversion_vector.x = const.BORDER_EVASION_BASE ** -(self.boid.position.x - const.WIDTH_INNER)
+            aversion_vector.y += 0.01
         elif self.boid.position.x > const.WIDTH_OUTER:
             aversion_vector.x = -(const.BORDER_EVASION_BASE ** (self.boid.position.x - const.WIDTH_OUTER))
+            aversion_vector.y += 0.01
         if self.boid.position.y < const.HEIGHT_INNER:
             aversion_vector.y = const.BORDER_EVASION_BASE ** -(self.boid.position.y - const.HEIGHT_INNER)
+            aversion_vector.x += 0.01
         elif self.boid.position.y > const.HEIGHT_OUTER:
             aversion_vector.y = -(const.BORDER_EVASION_BASE ** (self.boid.position.y - const.HEIGHT_OUTER))
+            aversion_vector.x += 0.01
         return aversion_vector
