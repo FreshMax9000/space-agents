@@ -14,8 +14,8 @@ class MaxBehaviour(BaseBehaviour):
         if len(enemies) == 0:
             direction = self.border_aversion()
         else:
-            direction = enemies.sprites()[0].position - self.boid.position
-        direction = self.border_aversion()   
+            closest_enemy = min([e for e in enemies], key=lambda e: self.boid.position.distance_to(e.position))
+            direction = (closest_enemy.position - self.boid.position).normalize() - self.boid.direction * 2
         fire = not self.boid.probe_fire(friends) and len(enemies) != 0
 
         return (direction, fire, None)
