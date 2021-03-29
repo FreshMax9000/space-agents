@@ -70,7 +70,7 @@ class Boid(pg.sprite.Sprite):
             self.fire(laser_sprites)
         # Update representation
         self.position += self.direction * self.velocity * dt 
-        speed, self.heading = self.direction.as_polar()
+        _, self.heading = self.direction.as_polar()
         self.image = pg.transform.rotate(self.__class__.image, -self.heading)
         self.rect = self.image.get_rect(center=self.position)
         return distress_call  
