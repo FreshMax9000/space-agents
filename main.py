@@ -16,6 +16,7 @@ from boids import XWing
 from boids import TieFighter
 from behaviours import StandardBehaviour
 from faction import Faction
+from max_behaviour import MaxBehaviour
 
 
 logging.basicConfig(
@@ -63,7 +64,7 @@ def fill_rebels(x_wings, count):
 def fill_imperial(tie_fighters, count):
     for i in range(int(math.sqrt(count))):
         for j in range(int(math.sqrt(count))):
-            tie = TieFighter(pg.Vector2((i * 30 + 750, j * 30 + 750)), StandardBehaviour)
+            tie = TieFighter(pg.Vector2((i * 30 + 750, j * 30 + 750)), MaxBehaviour)
             tie_fighters.add(tie)
 
 def show_info(info: str):
@@ -106,7 +107,6 @@ def main():
         if len(factions[0]) == 0:
             show_info("The rebel alliance has won!")
             exit()
-        #update(boids, factions, dt)
         update(factions, dt)
         draw(screen, background, factions)
 
