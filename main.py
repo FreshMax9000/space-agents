@@ -16,7 +16,8 @@ from boids import XWing
 from boids import TieFighter
 from behaviours import StandardBehaviour
 from faction import Faction
-from max_behaviour import MaxBehaviour, MaxBehaviour2
+# Import behaviours
+from max_behaviour import MaxBehaviour, MaxBehaviour2, DummDumm
 from benny_behaviour import BennyBehaviour
 
 
@@ -32,10 +33,10 @@ laserSprites = pg.sprite.RenderUpdates()
 def draw(screen, background, factions):
     # Draw status
     font = pg.font.Font(None, 30)
-    text = f"Rebel count: {len(factions[1])}; Imperial count: {len(factions[0])}"
-    status_surface = pg.Surface((800, 200))
+    text = f"{factions[1].name} - {len(factions[1])} : {len(factions[0])} - {factions[0].name}"
+    status_surface = pg.Surface((1700, 200))
     status_surface.fill((0, 0, 0))
-    status_surface.blit(font.render(text, 1, (255, 255, 255)), (0, 0))
+    status_surface.blit(font.render(text, 1, (255, 255, 255)), (480, 0))
     screen.blit(status_surface, status_surface.get_rect())
     pg.display.update(status_surface.get_rect())
     
@@ -67,16 +68,16 @@ def update(factions, dt):
                 logging.warning(f"Faction \"{faction}\" is empty!")
         faction.update(friends, enemies, laserSprites, dt)
 
-def fill_rebels(x_wings, count):
+def fill_rebels(x_wings, count, rebel_class):
     for i in range(int(math.sqrt(const.REBEL_COUNT))):
         for j in range(int(math.sqrt(const.REBEL_COUNT))):
-            xwing = XWing(pg.Vector2((i * 30, j * 30 + 300)), BennyBehaviour)
+            xwing = XWing(pg.Vector2((i * 30, j * 30 + 500)), rebel_class)
             x_wings.add(xwing)
 
-def fill_imperial(tie_fighters, count):
+def fill_imperial(tie_fighters, count, imperial_class):
     for i in range(int(math.sqrt(count))):
         for j in range(int(math.sqrt(count))):
-            tie = TieFighter(pg.Vector2((i * 30 + 1500, j * 30 + 300)), MaxBehaviour2)
+            tie = TieFighter(pg.Vector2((i * 30 + 1500, j * 30 + 500)), imperial_class)
             tie_fighters.add(tie)
 
 def show_info(info: str):
@@ -88,7 +89,7 @@ def exit():
     pg.quit()
     sys.exit(0)
 
-def main():
+def run_simulation(behaviour1, behaviour2):
     pg.init()
     screen = pg.display.set_mode((const.WIDTH, const.HEIGHT))
     screen.set_alpha(255)
@@ -100,15 +101,17 @@ def main():
 
     x_wings = pg.sprite.RenderUpdates()
     tie_fighters = pg.sprite.RenderUpdates()
-    fill_rebels(x_wings, const.REBEL_COUNT)
-    fill_imperial(tie_fighters, const.IMPERIAL_COUNT)
-    imperial_faction = Faction("Imperium", tie_fighters)
-    rebel_faction = Faction("Rebellen", x_wings)
+    fill_rebels(x_wings, const.REBEL_COUNT, behaviour1)
+    fill_imperial(tie_fighters, const.IMPERIAL_COUNT, behaviour2)
+    rebel_faction = Faction(f"{behaviour1.__name__} (Rebellen)", x_wings)
+    imperial_faction = Faction(f"{behaviour2.__name__} (Imperium)", tie_fighters)    
     factions = [imperial_faction, rebel_faction]
 
     time.sleep(3)
 
     fps_clock = pg.time.Clock()
+
+    start_time = time.time()
 
     while(True):
         for event in pg.event.get():
@@ -118,13 +121,29 @@ def main():
         if fps_clock.get_rawtime() == fps_clock.get_time():
             logging.warning(f"Lagging behind {fps_clock.get_rawtime() - 1.0 / const.FPS}ms!")
         if len(factions[1]) == 0:
-            show_info("The empire has won!")
+            show_info(f"{factions[0].name} has won!")
             exit()
         if len(factions[0]) == 0:
-            show_info("The rebel alliance has won!")
+            show_info(f"{factions[1].name} has won!")
             exit()
         update(factions, dt)
         draw(screen, background, factions)
+
+        if time.time() > (start_time + 120.0):
+            if len(factions[0]) == len(factions[1]):
+                show_info("Its a draw!")
+                exit()
+            elif len(factions[1]) > len(factions[0]):
+                show_info(f"{factions[1].name} has won!")
+                exit()
+            else:
+                show_info(f"{factions[0].name} has won!")
+                exit()
+
+
+def main():
+    run_simulation(DummDumm, DummDumm)
+
 
 if __name__ == "__main__":
     main()
