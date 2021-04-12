@@ -88,3 +88,14 @@ class MaxBehaviour2(BaseBehaviour):
             direction = self.separation(friends) + self.border_aversion() + self.spinny_spinny() * 0.01 + self.boid.direction
             fire = False
         return (direction, fire, None)
+
+
+class DummDumm(BaseBehaviour):
+
+    def __init__(self, boid):
+        super().__init__(boid)
+
+    def get_moves(self, friends, enemies, laser_hit_enemy, distress_calls):
+        direction = pg.Vector2((self.boid.direction.y, -self.boid.direction.x))
+        fire = False
+        return (direction, fire, None)
