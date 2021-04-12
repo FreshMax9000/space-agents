@@ -14,9 +14,9 @@ from lasers import DeadlyLaserRed
 from lasers import DeadlyLaserGreen
 from boids import XWing
 from boids import TieFighter
-from behaviours import StandardBehaviour
 from faction import Faction
 # Import behaviours
+from behaviours import StandardBehaviour
 from max_behaviour import MaxBehaviour, MaxBehaviour2, DummDumm
 from benny_behaviour import BennyBehaviour
 
@@ -30,10 +30,10 @@ logging.basicConfig(
 laserSprites = pg.sprite.RenderUpdates()
 
 
-def draw(screen, background, factions):
+def draw(screen, background, factions, time_gone):
     # Draw status
     font = pg.font.Font(None, 30)
-    text = f"{factions[1].name} - {len(factions[1])} : {len(factions[0])} - {factions[0].name}"
+    text = f"{factions[1].name} - {len(factions[1])} : {len(factions[0])} - {factions[0].name}                                                                                {time_gone:.1f}s"
     status_surface = pg.Surface((1700, 200))
     status_surface.fill((0, 0, 0))
     status_surface.blit(font.render(text, 1, (255, 255, 255)), (480, 0))
@@ -127,9 +127,10 @@ def run_simulation(behaviour1, behaviour2):
             show_info(f"{factions[1].name} has won!")
             exit()
         update(factions, dt)
-        draw(screen, background, factions)
+        time_gone = time.time() - start_time
+        draw(screen, background, factions, time_gone)
 
-        if time.time() > (start_time + 120.0):
+        if time_gone > 120.0:
             if len(factions[0]) == len(factions[1]):
                 show_info("Its a draw!")
                 exit()
@@ -142,7 +143,7 @@ def run_simulation(behaviour1, behaviour2):
 
 
 def main():
-    run_simulation(DummDumm, DummDumm)
+    run_simulation(MaxBehaviour2, StandardBehaviour)
 
 
 if __name__ == "__main__":
