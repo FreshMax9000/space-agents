@@ -132,6 +132,10 @@ class MaxBehaviour3(MaxBehaviour2):
         angle_dif = abs(abs(offset_pos.as_polar()[1]) - abs(boid.direction.as_polar()[1]))
         return angle_dif < 30
 
+    def get_abs_angle_to(self, boid):
+        offset_pos = boid.position - self.boid.position
+        return abs(abs(offset_pos.as_polar()[1]) - abs(self.boid.direction.as_polar()[1]))
+
     def get_moves(self, friends, enemies, laser_hit_enemy, distress_calls):
         if len(enemies) != 0:
             get_scared_list = tuple(map(self.get_scared, enemies))
@@ -140,7 +144,7 @@ class MaxBehaviour3(MaxBehaviour2):
                 fire = False
                 direction = -(self.get_enemy_center(enemies) - self.boid.position)
             else:
-                fire = True
+                fire = self.get_abs_angle_to(self.get_closest_enemy(enemies)) < 30
                 direction = self.get_closest_enemy(enemies).position - self.boid.position
         else:
             direction = self.separation(friends) * 3 + self.border_aversion() * 5e-7 + self.alignment(friends) * 0.1
