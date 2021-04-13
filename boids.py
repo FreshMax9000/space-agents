@@ -77,9 +77,9 @@ class Boid(pg.sprite.Sprite):
 
     def limit_turn(self, desired_turn: pg.Vector2):
         if desired_turn.angle_to(self.direction) > const.MAXIMUM_TURN_ANGLE:
-            desired_turn = desired_turn.rotate(const.MAXIMUM_TURN_ANGLE)
+            desired_turn = self.direction.rotate(-const.MAXIMUM_TURN_ANGLE)
         elif desired_turn.angle_to(self.direction) < -const.MAXIMUM_TURN_ANGLE:
-            desired_turn = desired_turn.rotate(-const.MAXIMUM_TURN_ANGLE)
+            desired_turn = self.direction.rotate(const.MAXIMUM_TURN_ANGLE)
         try:
             desired_turn = desired_turn.normalize()
         except ValueError:
