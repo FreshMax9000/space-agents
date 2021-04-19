@@ -5,31 +5,53 @@ import constants as const
 
 from behaviours import BaseBehaviour
 
+import time
+
+import random
+
 #best against max & standard
-ALIGNMENT = 8
-COHESION = 0.09
-SEPERATION = 250
-HUNTING = 500
+ALIGNMENT = 0.9
+COHESION = 0.04
+SEPERATION = 200
+HUNTING = 2000
 AVOID_ENEMY = 0
 
-CLOSEST_ENEMY_HUNTING = 5
-ENEMY_CENTER_HUNTING = 1
+CLOSEST_ENEMY_HUNTING = 1
+ENEMY_CENTER_HUNTING = 0
 
 class BennyBehaviour(BaseBehaviour):
 
     def __init__(self, boid):
         super().__init__(boid)
+        self.t0=time.time()
+        self.start_phase = True
+
+    def get_attack(self,closest_enemy):
+        offset_pos = self.boid.position - closest_enemy.position
+        angle_dif = abs(abs(offset_pos.as_polar()[1]) - abs(closest_enemy.direction.as_polar()[1]))
+
+
 
     def get_moves(self, friends, enemies, laser_hit_enemy, distress_calls):
         if len(friends) == 0 and len(enemies) == 0:
             print("err")
-        direction = self.compute(friends, enemies)
+        #closest_enemy = self.get_closest_enemy(enemies)
+        #if self.get_attack(closest_enemy):
+        #    fire = False
+        #    direction = -(self.get_closest_enemy(enemies).position - self.boid.position)
+        #else:
+        #    fire = True
+        #    direction = self.get_closest_enemy(enemies).position - self.boid.position
         fire = laser_hit_enemy
+
+        direction = self.compute(friends, enemies,fire)
+
         return (direction, fire, None)
 
-    def alignment(self, boids):
+    def alignment(self, friends):
         average_heading_vector = pg.Vector2((0, 0))
-        for boid in boids:
+
+        for boid in friends:
             if not self.boid.position.distance_squared_to(boid.position) == 0.0:
                 average_heading_vector += boid.direction.normalize()
         if average_heading_vector.length() == 0.0:
@@ -39,6 +61,7 @@ class BennyBehaviour(BaseBehaviour):
     def cohesion(self, boids):
         swarm_center = pg.Vector2((0, 0))
         counted = 0
+
         for boid in boids:
             if not self.boid.position.distance_squared_to(boid.position) == 0.0:
                 swarm_center += boid.position
@@ -50,6 +73,7 @@ class BennyBehaviour(BaseBehaviour):
 
     def separation(self, friends):
         aversion_vector = pg.Vector2((0, 0))
+
         for boid in friends:
             if not self.boid.position.distance_squared_to(boid.position) == 0.0:
                 aversion_vector += -1 / self.boid.position.distance_squared_to(boid.position) * (
@@ -105,11 +129,12 @@ class BennyBehaviour(BaseBehaviour):
 
         return -(enemy_center - self.boid.position) * (1 / self.boid.position.distance_to(enemy_center))
 
-    def compute(self, boids, enemy_boids):
+    def compute(self, boids, enemy_boids,fire):
         direction_vector = self.alignment(boids) * ALIGNMENT
         direction_vector += self.cohesion(boids) * COHESION
         direction_vector += self.separation(boids) * SEPERATION
-        direction_vector += self.border_aversion()
+        if not fire:
+            direction_vector += self.border_aversion()
         direction_vector += self.hunting(enemy_boids) * HUNTING
         direction_vector += self.avoid_enemy_swarm(enemy_boids) * AVOID_ENEMY
 
