@@ -130,7 +130,7 @@ def run_simulation(behaviour1, behaviour2):
         time_gone = time.time() - start_time
         draw(screen, background, factions, time_gone)
 
-        if time_gone > 120.0:
+        if time_gone > 60.0:
             if len(factions[0]) == len(factions[1]):
                 show_info("Its a draw!")
                 exit()
@@ -143,7 +143,7 @@ def run_simulation(behaviour1, behaviour2):
 
 
 def main():
-    run_simulation(MaxBehaviour3, StandardBehaviour)
+    run_simulation(MaxBehaviour2, MaxBehaviour3)
 
 
 if __name__ == "__main__":
