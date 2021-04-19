@@ -130,12 +130,14 @@ class BennyBehaviour(BaseBehaviour):
         return -(enemy_center - self.boid.position) * (1 / self.boid.position.distance_to(enemy_center))
 
     def compute(self, boids, enemy_boids,fire):
+
         direction_vector = self.alignment(boids) * ALIGNMENT
         direction_vector += self.cohesion(boids) * COHESION
         direction_vector += self.separation(boids) * SEPERATION
         if not fire:
             direction_vector += self.border_aversion()
+
         direction_vector += self.hunting(enemy_boids) * HUNTING
-        direction_vector += self.avoid_enemy_swarm(enemy_boids) * AVOID_ENEMY
+        direction_vector += self.hunting(enemy_boids) * HUNTING
 
         return direction_vector
