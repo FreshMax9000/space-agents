@@ -17,6 +17,7 @@ from boids import TieFighter
 from faction import Faction
 # Import behaviours
 from behaviours import StandardBehaviour
+from marvin_behaviour import MarvinBehaviour
 from max_behaviour import MaxBehaviour, MaxBehaviour2, MaxBehaviour3, DummDumm
 from benny_behaviour import BennyBehaviour
 from tobi_behaviour import TobiBehaviour
@@ -144,7 +145,7 @@ def run_simulation(behaviour1, behaviour2):
 
 
 def main():
-    run_simulation(TobiBehaviour, StandardBehaviour)
+    run_simulation(MarvinBehaviour, MaxBehaviour3)
 
 
 if __name__ == "__main__":
