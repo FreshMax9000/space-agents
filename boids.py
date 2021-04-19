@@ -76,9 +76,14 @@ class Boid(pg.sprite.Sprite):
         return distress_call  
 
     def limit_turn(self, desired_turn: pg.Vector2):
-        if desired_turn.angle_to(self.direction) > const.MAXIMUM_TURN_ANGLE:
+        try:
+            desired_turn = desired_turn.normalize()
+        except ValueError:
+            return self.direction
+        angle_to_direction = desired_turn.angle_to(self.direction)
+        if angle_to_direction > const.MAXIMUM_TURN_ANGLE and angle_to_direction <= 180:
             desired_turn = self.direction.rotate(-const.MAXIMUM_TURN_ANGLE)
-        elif desired_turn.angle_to(self.direction) < -const.MAXIMUM_TURN_ANGLE:
+        elif angle_to_direction < (360 - const.MAXIMUM_TURN_ANGLE) and angle_to_direction >= 180:
             desired_turn = self.direction.rotate(const.MAXIMUM_TURN_ANGLE)
         try:
             desired_turn = desired_turn.normalize()

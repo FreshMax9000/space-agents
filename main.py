@@ -19,6 +19,7 @@ from faction import Faction
 from behaviours import StandardBehaviour
 from max_behaviour import MaxBehaviour, MaxBehaviour2, MaxBehaviour3, DummDumm
 from benny_behaviour import BennyBehaviour
+from tobi_behaviour import TobiBehaviour
 
 
 logging.basicConfig(
@@ -143,7 +144,7 @@ def run_simulation(behaviour1, behaviour2):
 
 
 def main():
-    run_simulation(MaxBehaviour2, MaxBehaviour3)
+    run_simulation(TobiBehaviour, StandardBehaviour)
 
 
 if __name__ == "__main__":
