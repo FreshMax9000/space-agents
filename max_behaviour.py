@@ -140,7 +140,6 @@ class MaxBehaviour3(MaxBehaviour2):
         if len(enemies) != 0:
             get_scared_list = tuple(map(self.get_scared, enemies))
             if any(get_scared_list):
-            #if self.get_scared(closest_enemy):
                 fire = False
                 direction = -(self.get_enemy_center(enemies) - self.boid.position)
             else:
