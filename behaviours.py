@@ -20,8 +20,6 @@ class StandardBehaviour(BaseBehaviour):
         super().__init__(boid)
 
     def get_moves(self, friends, enemies, laser_hit_enemy, distress_calls):
-        if len(friends) == 0 and len(enemies) == 0:
-            print("err")
         direction = self.compute(friends, enemies)
         fire = laser_hit_enemy
         return (direction, fire, None)
